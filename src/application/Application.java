@@ -9,6 +9,7 @@ import logger.MyLogger;
 import dsassigment.Client;
 import dsassigment.Manager;
 import dsassigment.Mapper;
+import javax.swing.JOptionPane;
 
 public class Application {
 	
@@ -21,25 +22,32 @@ public class Application {
 	}
 
 	private static void showMenu() {
-		System.out.println("Choose Num to pick role");
-		System.out.println("1 Client");
-		System.out.println("2 Mapper");
-		System.out.println("3 Reducer");
-		int choice;
-		do{
-			System.out.print(">");
-			choice = sc.nextInt();
-		}while(choice>3||choice<=0);
+		//System.out.println("Choose Num to pick role");
+		//System.out.println("1 Client");
+		//System.out.println("2 Mapper");
+		//System.out.println("3 Reducer");
+
+                String[] choices = { "Client", "Mapper", "Reducer"};
+                String input = (String) JOptionPane.showInputDialog(null, "Role",
+                    "PickRole", JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+                System.out.println(input);
+
+//		int choice;
+//		do{
+//			System.out.print(">");
+//			choice = sc.nextInt();
+//		}while(choice>3||choice<=0);
 		
-		if(choice==1)
+		if(input.equals(choices[0]))
 		{
 		
-			new Thread(new Manager()).start();
-			
+			//new Thread(new Manager()).start();
+                   
+			new Manager().start();
 			MyLogger.log("Manager Thread Started");
 			
 			try {
-				Thread.sleep(15000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -48,11 +56,11 @@ public class Application {
 			new Thread(new Client()).start();
 			
 		}
-		else if(choice==2)
+		else if(input.equals(choices[1]))
 		{
 			new Thread(new Mapper()).start();
 		}
-		else
+                else if(input.equals(choices[2]))
 		{
 			
 		}

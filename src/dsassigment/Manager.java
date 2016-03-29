@@ -1,5 +1,6 @@
 package dsassigment;
 
+import application.ManagerWindow;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,6 +26,8 @@ public class Manager extends Thread{
 	{
 		workersAddreses= new ArrayList<InetAddress>();
 		ports= new ArrayList<Integer>();
+                
+                new ManagerWindow(this);
 //		try {
 //			workersAddreses.add(InetAddress.getByName("172.16.2.34"));
 //			ports.add(123);
@@ -34,12 +37,25 @@ public class Manager extends Thread{
 //		}
 		
 	}
-	
+        
+        public void addWorker(InetAddress address, int port)
+        {
+            workersAddreses.add(address);
+            ports.add(port);
+        }
+
+    @Override
+    public synchronized void start()
+    {
+        new Thread(this).start();
+    }
+	 
+        
 	@Override
 	public void run() {
 		System.out.println("Starting Manager");
 		try {
-			askWorkersIP(); //----------------------------------------------------ask ip
+			//askWorkersIP(); //----------------------------------------------------ask ip
 			serverSocket = new ServerSocket(4321);			
 			while(true)
 			{
@@ -124,8 +140,8 @@ public class Manager extends Thread{
 					points=(Point[])pointstmp;
 				}
 				
-				MyLogger.log("P(0)"+points[0].x+","+points[0].y);
-				MyLogger.log("P(1)"+points[1].x+","+points[1].y);
+				MyLogger.log("Server Recieved P(0)"+points[0].x+","+points[0].y+" P(1)"+points[1].x+","+points[1].y);
+				//MyLogger.log(");
 				
 				int NumOfWorkersToUse = workersAddreses.size();
 				double dx = points[1].x-points[0].x;
@@ -144,7 +160,7 @@ public class Manager extends Thread{
 				}
 				
 				for (int i = 0; i < workersAddreses.size(); i++) {
-					SendWorkToWorkers work = new SendWorkToWorkers(workersAddreses.get(i),ports.get(i),startPoints.get(i),endPoints.get(i));
+					SendWorkToWorker work = new SendWorkToWorker(workersAddreses.get(i),ports.get(i),startPoints.get(i),endPoints.get(i));
 					work.sendWork();
 				}
 			
@@ -158,14 +174,14 @@ public class Manager extends Thread{
 		}
 	}
 	
-	private class SendWorkToWorkers //extends Thread
+	private class SendWorkToWorker //extends Thread
 	{
 		InetAddress address;
 		int port;
 		Point start;
 		Point end;
 		
-		public SendWorkToWorkers(InetAddress address, int port, Point start,Point end)
+		public SendWorkToWorker(InetAddress address, int port, Point start,Point end)
 		{
 			this.address=address;
 			this.port=port;

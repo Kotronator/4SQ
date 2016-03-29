@@ -1,5 +1,6 @@
 package dsassigment;
 
+import application.ClientWindow;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -17,6 +18,8 @@ public class Client extends Thread {
 			points[i] = new Point();
 			
 		}
+                
+                new ClientWindow(this);
 	}
 
 	private void askCoordinates() {
@@ -32,11 +35,15 @@ public class Client extends Thread {
 		
 		
 	}
+        public void setPoints(Point[] points)
+        {
+            this.points=points;
+        }
 	
 	@Override
 	public void run() {
-		askCoordinates();
-		sendPointsToManager();
+		//askCoordinates();
+		//sendPointsToManager();
 	}
 	public  void sendPointsToManager()
 	{
