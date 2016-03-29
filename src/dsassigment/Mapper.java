@@ -29,7 +29,7 @@ public class Mapper extends Thread implements MapWorker
     public Mapper()
     {
         MyLogger.log("Create Mapper");
-       new Thread(this).start();
+       
     }
 
     @Override
@@ -88,7 +88,7 @@ public class Mapper extends Thread implements MapWorker
             do
             {
                 Socket client = serverSocket.accept();
-                ClientHandler ch = new ClientHandler(client);
+                WorkHandler ch = new WorkHandler(client);
                 new Thread(ch).start();
                 
             }while(true);
