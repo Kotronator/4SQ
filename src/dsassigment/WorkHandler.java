@@ -60,17 +60,7 @@ public class WorkHandler extends Thread
 			
 			MyLogger.log("P(0)"+points[0].x+","+points[0].y);
 			MyLogger.log("P(1)"+points[1].x+","+points[1].y);
-            //String ans = in.readUTF();
-//            if(ans.equals("4SQ"))
-//            {
-//                double x1=in.readDouble();
-//                double y1=in.readDouble();
-//                double x2=in.readDouble();
-//                double y2=in.readDouble();
-//                DBAgent dbag= new DBAgent();
-//                dbag.createQuery(""+((int)x1));
-//            }
-            
+
             
         } catch (IOException | ClassNotFoundException ex)
         {
