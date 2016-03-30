@@ -29,7 +29,8 @@ public class Mapper extends Thread implements MapWorker
     public Mapper()
     {
         MyLogger.log("Create Mapper");
-       
+        MyLogger.log("Mapper has "+Runtime.getRuntime().availableProcessors()+" Processors");
+        
     }
 
     @Override
