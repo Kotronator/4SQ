@@ -60,14 +60,14 @@ public class DBAgent
             //STEP 5: Extract data from result set
             while(rs.next()){
                 //Retrieve by column name
-                int id  = rs.getInt("id");
-                int age = rs.getInt("POI_category_id");
+                //int id  = rs.getInt("id");
+                //int age = rs.getInt("POI_category_id");
                 
                 results.add(new CheckIn(rs.getInt("id"), rs.getInt("user"), rs.getString("POI"), rs.getString("POI_name"), rs.getString("POI_category"), rs.getInt("POI_category_id"), rs.getDouble("latitude"), rs.getInt("longitude"), rs.getDate("time"), rs.getString("photos")) );
                         //CheckIn(int id, int user, String POI, String POI_name, String POI_category, int POI_category_id, double latitude, double longitude, Date time, String photos)
                 //Display values
-                System.out.print("ID: " + id);
-                System.out.println(", POI_category_id: " + age);
+                //System.out.print("ID: " + id);
+                //System.out.println(", POI_category_id: " + age);
                 
             }
             //STEP 6: Clean-up environment

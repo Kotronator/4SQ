@@ -37,9 +37,9 @@ class CheckIn
     }
 
    
-    public String getPoi()
+    public static String getPoi(CheckIn c)
     {
-        return POI;
+        return c.POI;
     }
 
     
