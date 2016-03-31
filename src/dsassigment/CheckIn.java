@@ -6,13 +6,16 @@
 
 package dsassigment;
 
+import com.sun.corba.se.spi.ior.Identifiable;
 import java.sql.Date;
+import org.omg.CORBA_2_3.portable.OutputStream;
 
 /**
  *
  * @author Giannis
  */
-class CheckIn {
+class CheckIn 
+{
     
     int id,  user, POI_category_id;
     String POI,  POI_name, POI_category, photos;
@@ -32,7 +35,12 @@ class CheckIn {
         this.time=time;
         this.photos=photos;
     }
-            
+
+   
+    public String getPoi()
+    {
+        return POI;
+    }
 
     
 }

@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import logger.MyLogger;
 
 /**
@@ -193,6 +196,17 @@ public class Mapper extends Thread implements MapWorker
                 }
             
         }
+        
+         public Map<String, Integer> countJava8(Stream<CheckIn> input) 
+         {
+             return input.collect(groupingBy(name ->, counting()));
+         }
+        
+        
+//        public Map<String, Integer> countJava8(ArrayList<CheckIn> input) {
+//                //input.stream().collect(groupingBy(CheckIn::getPoi),Collectors.summingInt(s -> 1));
+////return input.stream().collect(Collectors.groupingBy(,Collectors.summingInt(s -> 1)));
+//        }
 
 
     }
