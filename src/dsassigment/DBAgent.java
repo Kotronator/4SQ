@@ -23,8 +23,8 @@ public class DBAgent
 {
     String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
     String DB_URL = "jdbc:mysql://83.212.117.76";
-    String USER = "omada64";//"auebuser";
-    String PASS = "omada64db";//"3120077pauebDS";
+    String USER = "omada64";
+    String PASS = "omada64db";
     Connection conn = null;
     Statement stmt = null;
     

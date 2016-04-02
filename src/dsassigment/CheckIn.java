@@ -6,16 +6,17 @@
 
 package dsassigment;
 
-import com.sun.corba.se.spi.ior.Identifiable;
+import java.io.Serializable;
 import java.sql.Date;
-import org.omg.CORBA_2_3.portable.OutputStream;
+
 
 /**
  *
  * @author Giannis
  */
-class CheckIn 
+public class CheckIn implements Serializable
 {
+    static final long serialVersionUID = 6255555085804177083L;  
     
     int id,  user, POI_category_id;
     String POI,  POI_name, POI_category, photos;
@@ -41,6 +42,21 @@ class CheckIn
     {
         return c.POI;
     }
+    
+     public static String getPhoto(CheckIn c)
+    {
+        return c.photos;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return "POI:"+POI+" latitude:"+latitude+" longitude:"+longitude;
+    }
 
+    
+    public static CheckinKey getCheckinKey(CheckIn c){ return new  CheckinKey(c.POI, c.POI_name);}
+    
+     public static CheckinValue getCheckinValue(CheckIn c){ return new CheckinValue(c.photos, c.longitude, c.latitude);}
     
 }

@@ -5,7 +5,6 @@
  */
 package dsassigment;
 
-import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,20 +13,15 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import logger.MyLogger;
 
 /**
@@ -170,7 +164,8 @@ public class Mapper extends Thread implements MapWorker
 
                             MyLogger.log("P(0)"+points[0].x+","+points[0].y);
                             MyLogger.log("P(1)"+points[1].x+","+points[1].y);
-                            askDataBase(points);
+                            ArrayList<CheckIn> list = askDataBase(points);
+                            mapData(list);
 
 
             } catch (IOException | ClassNotFoundException ex)
@@ -179,26 +174,39 @@ public class Mapper extends Thread implements MapWorker
             }
         }
 
-        private void askDataBase(Point[] points) {
+        private ArrayList<CheckIn> askDataBase(Point[] points) {
             
             DBAgent dba = new DBAgent();
             ArrayList<CheckIn> results= dba.createQuery(DBAgent.formQueryWithPoints(points));
-//                for (CheckIn checkIn : results) {
-//                    
-//                
-//                    //Retrieve by column name
-//                    int id  = checkIn.id;
-//                    int POI_category_id  = checkIn.POI_category_id;
-//                    Date time = checkIn.time;
-//                    
-//                    
-//                    //Display values
-//                    System.out.print("ID: " + id);
-//                    System.out.print(" POI_category_id: " + POI_category_id);
-//                    System.out.println(" Time: " + time.toString());
-//                    
-//                }
-            LinkedHashMap<String, Integer> data = countJava8(results.stream());
+
+            return results;
+//            Map<CheckinKey, List<CheckinValue>> data = mapList(results);
+//            
+//            Set set = data.entrySet();
+//            Iterator it = set.iterator();
+//            
+//            int i=0;
+//            while(it.hasNext()&& i<10)
+//            {
+//                Map.Entry entry = (Map.Entry )it.next();
+//                System.out.println("Poi"+entry.getKey()+" Count:"+entry.getValue());
+//                i++;
+//            }
+          
+            
+        }
+
+        public Map<CheckinKey, List<CheckinValue>> mapList(ArrayList<CheckIn> input) 
+        {
+
+           Comparator<Map.Entry<String,Integer>> comp =Map.Entry.<String,Integer>comparingByValue(Comparator.reverseOrder())
+                   .thenComparing(Map.Entry.comparingByKey());
+            return  input.parallelStream().collect(  Collectors.groupingBy(CheckIn::getCheckinKey,Collectors.mapping(CheckIn::getCheckinValue, Collectors.toList())));
+        }
+
+        private void mapData(ArrayList<CheckIn> list) {
+             Map<CheckinKey, List<CheckinValue>> data = mapList(list);
+//            
             Set set = data.entrySet();
             Iterator it = set.iterator();
             
@@ -209,29 +217,9 @@ public class Mapper extends Thread implements MapWorker
                 System.out.println("Poi"+entry.getKey()+" Count:"+entry.getValue());
                 i++;
             }
-//            for (Map.Entry<String, Integer> entry : data.entrySet())
-//            {
-//                 System.out.println("Poi"+entry.getKey()+" Count:"+entry.getValue());
-//            }
-            
-            
         }
+         
         
-         public LinkedHashMap<String, Integer> countJava8(Stream<CheckIn> input) 
-         {
-            
-            Comparator<Map.Entry<String,Integer>> comp =Map.Entry.<String,Integer>comparingByValue(Comparator.reverseOrder())
-                    .thenComparing(Map.Entry.comparingByKey());
-             return input.collect(Collectors.groupingBy(CheckIn::getPoi, Collectors.summingInt(s -> 1)))
-                     .entrySet().stream().sorted(comp).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,(a,b)-> {throw new IllegalStateException("thn katsame");}, LinkedHashMap::new));
-         }
-        
-        
-//        public Map<String, Integer> countJava8(ArrayList<CheckIn> input) {
-//                //input.stream().collect(groupingBy(CheckIn::getPoi),Collectors.summingInt(s -> 1));
-////return input.stream().collect(Collectors.groupingBy(,Collectors.summingInt(s -> 1)));
-//        }
-
 
     }
     
