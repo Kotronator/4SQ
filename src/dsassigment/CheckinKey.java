@@ -22,12 +22,12 @@ public class CheckinKey {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof CheckinKey)) {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CheckinKey)) {
             return false;
         }
         
-        return POI.equals(((CheckinKey)o).POI);
+        return POI.equals(((CheckinKey)obj).POI);
     }
     
 

@@ -15,6 +15,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import logger.MyLogger;
 
 /**
@@ -164,8 +166,29 @@ public class Mapper extends Thread implements MapWorker
 
                             MyLogger.log("P(0)"+points[0].x+","+points[0].y);
                             MyLogger.log("P(1)"+points[1].x+","+points[1].y);
+                            
+                            long start, end; 
+                            start = System.currentTimeMillis();
+                            
                             ArrayList<CheckIn> list = askDataBase(points);
-                            mapData(list);
+                            System.out.println("Worker is processing:"+list.size()+" checkins");
+                            HashMap<CheckinKey, List<CheckinValue>> intermediate = mapData(list);
+                            
+                            end = System.currentTimeMillis();
+                            
+                            System.out.println("Processing Time:"+(end-start)/1000.0);
+                            
+                            
+                            Set set = intermediate.entrySet();
+                            Iterator it = set.iterator();
+
+                            int i=0;
+                            while(it.hasNext()&& i<10)
+                            {
+                                Map.Entry entry = (Map.Entry )it.next();
+                                System.out.println("Poi:"+entry.getKey()+" Count:"+entry.getValue());
+                                i++;
+                            }
 
 
             } catch (IOException | ClassNotFoundException ex)
@@ -196,27 +219,50 @@ public class Mapper extends Thread implements MapWorker
             
         }
 
-        public Map<CheckinKey, List<CheckinValue>> mapList(ArrayList<CheckIn> input) 
+        public HashMap<CheckinKey, List<CheckinValue>> mapData(ArrayList<CheckIn> list) 
         {
 
-           Comparator<Map.Entry<String,Integer>> comp =Map.Entry.<String,Integer>comparingByValue(Comparator.reverseOrder())
-                   .thenComparing(Map.Entry.comparingByKey());
-            return  input.parallelStream().collect(  Collectors.groupingBy(CheckIn::getCheckinKey,Collectors.mapping(CheckIn::getCheckinValue, Collectors.toList())));
+//           Comparator<Map.Entry<String,Integer>> comp =Map.Entry.<String,Integer>comparingByValue(Comparator.reverseOrder())
+//                   .thenComparing(Map.Entry.comparingByKey());
+//            return  input.parallelStream().collect(  Collectors.groupingBy(CheckIn::getCheckinKey,Collectors.mapping(CheckIn::getCheckinValue, Collectors.toList())));
+            
+            return  splitData(list).parallelStream().map(Area::collectCheckins).sequential().reduce(new MyMap(),(finalMap,partialMap)-> finalMap.addMap(partialMap),(finalMap1, finalMap2) -> finalMap1.addMap(finalMap2));
+            
+     
         }
 
-        private void mapData(ArrayList<CheckIn> list) {
-             Map<CheckinKey, List<CheckinValue>> data = mapList(list);
-//            
-            Set set = data.entrySet();
-            Iterator it = set.iterator();
+        private ArrayList<Area> splitData(ArrayList<CheckIn> list) {
+  
+            int processors = Runtime.getRuntime().availableProcessors();
+            int partSize = list.size()/processors;
+            ArrayList<Area> areas = new ArrayList<>(processors);
             
-            int i=0;
-            while(it.hasNext()&& i<10)
+            if(list.size()>= processors*2){
+
+                for (int i = 0; i < processors; i++)
+                {
+                    areas.add(new Area(list.subList(i*partSize, (i+1)*partSize)));
+                }
+                
+            }else
             {
-                Map.Entry entry = (Map.Entry )it.next();
-                System.out.println("Poi"+entry.getKey()+" Count:"+entry.getValue());
-                i++;
+                areas.add(new Area(list));
             }
+            
+//             Map<CheckinKey, List<CheckinValue>> data = mapData(areas);
+////            
+//            Set set = data.entrySet();
+//            Iterator it = set.iterator();
+//            
+//            int i=0;
+//            while(it.hasNext()&& i<10)
+//            {
+//                Map.Entry entry = (Map.Entry )it.next();
+//                System.out.println("Poi"+entry.getKey()+" Count:"+entry.getValue());
+//                i++;
+//            }
+            
+            return areas;
         }
          
         

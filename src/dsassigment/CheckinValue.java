@@ -32,6 +32,17 @@ public class CheckinValue {
         return "Photo:"+photoURL+" Long:"+longtitude+" Lati:"+latitude;
     }
 
+    @Override
+    public boolean equals(Object obj)
+    {
+         if (!(obj instanceof CheckinValue)) {
+            return false;
+        }
+        
+        CheckinValue ch = (CheckinValue)obj;
+        return photoURL.equals(ch.photoURL)&& longtitude == ch.longtitude && latitude == ch.latitude;
+    }
+
     
     
 }
