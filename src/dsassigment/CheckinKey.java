@@ -5,14 +5,18 @@
  */
 package dsassigment;
 
+import java.io.Serializable;
 import java.security.Key;
 
 /**
  *
  * @author TOSHIBA
  */
-public class CheckinKey {
+public class CheckinKey implements Serializable{
 
+    
+    private static final long serialVersionUID = 5497841316127816999L;
+    
     String POI,POI_name;
     
     public CheckinKey( String POI,String POI_name)

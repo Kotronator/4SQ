@@ -9,6 +9,7 @@ import logger.MyLogger;
 import dsassigment.Client;
 import dsassigment.Manager;
 import dsassigment.Mapper;
+import dsassigment.Reducer;
 import javax.swing.JOptionPane;
 
 public class Application {
@@ -62,7 +63,7 @@ public class Application {
 		}
                 else if(input.equals(choices[2]))
 		{
-			
+			new Thread(new Reducer()).start();
 		}
 		System.out.println();
 	}

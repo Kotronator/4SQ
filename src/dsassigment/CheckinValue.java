@@ -5,6 +5,7 @@
  */
 package dsassigment;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
@@ -13,7 +14,9 @@ import java.util.stream.Collector;
  *
  * @author TOSHIBA
  */
-public class CheckinValue {
+public class CheckinValue implements Serializable{
+    
+    private static final long serialVersionUID = 5497841316127816969L;
     
     String photoURL;
     Double longtitude,latitude;

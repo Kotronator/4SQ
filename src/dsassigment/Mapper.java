@@ -5,6 +5,7 @@
  */
 package dsassigment;
 
+import com.sun.jmx.snmp.BerDecoder;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -24,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.swing.JOptionPane;
 import logger.MyLogger;
 
 /**
@@ -34,6 +36,8 @@ public class Mapper extends Thread implements MapWorker
 {
     ServerSocket serverSocket;
     int portNum=4321;
+    private InetAddress reducerAddress;
+    private int reducerPortNum;
 
     public Mapper()
     {
@@ -57,6 +61,27 @@ public class Mapper extends Thread implements MapWorker
     @Override
     public void intialize()
     {
+        String input = JOptionPane.showInputDialog("Enter Input:(123.123.123.123:80)");
+
+        String parts[]=input.split(":");
+        String reducerAddressString=parts[0];
+        String reducerPortString=parts[1];
+			
+	//int reducerPortNum=Integer.parseInt(reducerPortString);
+	//InetAddress  address=null;	
+        try {
+                System.out.println(InetAddress.getByName(reducerAddressString));
+                reducerAddress= InetAddress.getByName(reducerAddressString);
+                reducerPortNum=Integer.parseInt(reducerPortString);
+
+
+        } catch (UnknownHostException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+        }
+        
+        MyLogger.log("Worker will sent results to"+ reducerAddress.getHostAddress() +":"+reducerPortNum);
+        
         boolean retry;
         do{
              retry=false;
@@ -172,23 +197,23 @@ public class Mapper extends Thread implements MapWorker
                             
                             ArrayList<CheckIn> list = askDataBase(points);
                             System.out.println("Worker is processing:"+list.size()+" checkins");
-                            HashMap<CheckinKey, List<CheckinValue>> intermediate = mapData(list);
+                            List<Map<CheckinKey, List<CheckinValue>>> intermediate = mapData(list);
                             
                             end = System.currentTimeMillis();
                             
                             System.out.println("Processing Time:"+(end-start)/1000.0);
                             
-                            
-                            Set set = intermediate.entrySet();
-                            Iterator it = set.iterator();
-
-                            int i=0;
-                            while(it.hasNext()&& i<10)
-                            {
-                                Map.Entry entry = (Map.Entry )it.next();
-                                System.out.println("Poi:"+entry.getKey()+" Count:"+entry.getValue());
-                                i++;
-                            }
+                            sendToReducer(intermediate);
+//                            Set set = intermediate.entrySet();
+//                            Iterator it = set.iterator();
+//
+//                            int i=0;
+//                            while(it.hasNext()&& i<10)
+//                            {
+//                                Map.Entry entry = (Map.Entry )it.next();
+//                                System.out.println("Poi:"+entry.getKey()+" Count:"+entry.getValue());
+//                                i++;
+//                            }
 
 
             } catch (IOException | ClassNotFoundException ex)
@@ -219,14 +244,14 @@ public class Mapper extends Thread implements MapWorker
             
         }
 
-        public HashMap<CheckinKey, List<CheckinValue>> mapData(ArrayList<CheckIn> list) 
+        public List<Map<CheckinKey, List<CheckinValue>>> mapData(ArrayList<CheckIn> list) 
         {
 
 //           Comparator<Map.Entry<String,Integer>> comp =Map.Entry.<String,Integer>comparingByValue(Comparator.reverseOrder())
 //                   .thenComparing(Map.Entry.comparingByKey());
 //            return  input.parallelStream().collect(  Collectors.groupingBy(CheckIn::getCheckinKey,Collectors.mapping(CheckIn::getCheckinValue, Collectors.toList())));
             
-            return  splitData(list).parallelStream().map(Area::collectCheckins).sequential().reduce(new MyMap(),(finalMap,partialMap)-> finalMap.addMap(partialMap),(finalMap1, finalMap2) -> finalMap1.addMap(finalMap2));
+            return  splitData(list).parallelStream().map(Area::collectCheckins).collect(Collectors.toList());
             
      
         }
@@ -263,6 +288,24 @@ public class Mapper extends Thread implements MapWorker
 //            }
             
             return areas;
+        }
+
+        private void sendToReducer(List<Map<CheckinKey, List<CheckinValue>>> intermediate)
+        {
+            try
+            {
+                Socket reducerSocket = new Socket(reducerAddress, reducerPortNum);
+                ObjectOutputStream out = new ObjectOutputStream(reducerSocket.getOutputStream());
+		out.writeObject(intermediate);
+                MyLogger.log("Mapper wrotre:"+intermediate.size());
+                MyLogger.log("A0:"+intermediate.get(0).size());
+		out.flush();
+                
+                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            } catch (IOException ex)
+            {
+                Logger.getLogger(Mapper.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
          
         

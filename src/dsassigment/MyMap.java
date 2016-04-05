@@ -7,17 +7,20 @@ package dsassigment;
 
 import dsassigment.CheckinKey;
 import dsassigment.CheckinValue;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author tsipiripo
  */
-public class MyMap extends HashMap<CheckinKey ,List<CheckinValue>>
+public class MyMap extends HashMap<CheckinKey ,List<CheckinValue>> implements Serializable
 {
+    private static final long serialVersionUID = 5497841316127816666L;
     
-    public MyMap addMap(HashMap<CheckinKey ,List<CheckinValue>> map)
+    public MyMap addMap(Map<CheckinKey ,List<CheckinValue>> map)
     {
         for (Entry<CheckinKey, List<CheckinValue>> entrySet : map.entrySet())
         {
