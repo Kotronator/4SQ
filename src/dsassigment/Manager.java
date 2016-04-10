@@ -21,6 +21,7 @@ public class Manager extends Thread{
 	ServerSocket serverSocket;
 	ArrayList<InetAddress > workersAddreses;
 	ArrayList<Integer > ports;
+    private String reducerAddress;
 	
 	public Manager()
 	{
@@ -108,13 +109,20 @@ public class Manager extends Thread{
 		
 	}
 
+    public void setReducerAddress(String text)
+    {
+        this.reducerAddress=text;
+    }
+
 	private class ClientRequestHandler extends Thread
 	{
 		Socket clientCon;
 		ObjectInputStream in;
 		ObjectOutputStream out;
 		
-		Point[] points;//latitude,longitude;
+		//Point[] points;//latitude,longitude;
+                
+                CheckinQuestion question;
 		
 		ClientRequestHandler(Socket clientCon)
 		{
@@ -124,43 +132,48 @@ public class Manager extends Thread{
 		
 		@Override
 		public void run() {
-			points= new Point[2];
-			for (int i = 0; i < points.length; i++) {
-				points[i] = new Point();
-				
-			}
+//			points= new Point[2];
+//			for (int i = 0; i < points.length; i++) {
+//				points[i] = new Point();
+//				
+//			}
 			
 			try {
 				in = new ObjectInputStream(clientCon.getInputStream());
 				out = new ObjectOutputStream(clientCon.getOutputStream());
-				Object pointstmp = in.readObject();
+				Object questiontmp = in.readObject();
 				
-				if(pointstmp instanceof Point[])
+				if(questiontmp instanceof CheckinQuestion)
 				{
-					points=(Point[])pointstmp;
+					question=(CheckinQuestion)questiontmp;
 				}
 				
-				MyLogger.log("Server Recieved P(0)"+points[0].x+","+points[0].y+" P(1)"+points[1].x+","+points[1].y);
+				MyLogger.log("Server Recieved P(0)"+question.boundPoints[0].x+","+question.boundPoints[0].y+" P(1)"+question.boundPoints[1].x+","+question.boundPoints[1].y);
 				//MyLogger.log(");
 				
 				int NumOfWorkersToUse = workersAddreses.size();
-				double dx = points[1].x-points[0].x;
-				double dy = points[1].y-points[0].y;
+				double dx = question.boundPoints[1].x-question.boundPoints[0].x;
+				double dy = question.boundPoints[1].y-question.boundPoints[0].y;
 				
 				double xbound= dx/(double)NumOfWorkersToUse;
 				//double ybound= dy;
 				
-				ArrayList<Point> startPoints = new ArrayList<Point>();
-				ArrayList<Point> endPoints = new ArrayList<Point>();
+                                ArrayList<CheckinQuestion> questions = new ArrayList<CheckinQuestion>();
+				//ArrayList<CheckinQuestion> startPoints = new ArrayList<CheckinQuestion>();
+				//ArrayList<CheckinQuestion> endPoints = new ArrayList<CheckinQuestion>();
 				for (int i = 0; i < NumOfWorkersToUse; i++) {
-					Point tmpPoint1 = new Point(points[0].x+i*xbound, points[0].y);
-					startPoints.add(tmpPoint1);
+					Point tmpPoint1 = new Point(question.boundPoints[0].x+i*xbound, question.boundPoints[0].y);
+					//startPoints.add(tmpPoint1);
 					Point tmpPoint2 = new Point(tmpPoint1.x+xbound, tmpPoint1.y+dy);
-					endPoints.add(tmpPoint2);
+                                        CheckinQuestion q =new CheckinQuestion(new Point[]{tmpPoint1,tmpPoint2},question.tb);
+                                        q.setClientAddress(question.clientAddress);
+                                        questions.add(q);
+					//endPoints.add(tmpPoint2);
 				}
 				
 				for (int i = 0; i < workersAddreses.size(); i++) {
-					SendWorkToWorker work = new SendWorkToWorker(workersAddreses.get(i),ports.get(i),startPoints.get(i),endPoints.get(i));
+					//SendWorkToWorker work = new SendWorkToWorker(workersAddreses.get(i),ports.get(i),startPoints.get(i),endPoints.get(i));
+                                        SendWorkToWorker work = new SendWorkToWorker(workersAddreses.get(i),ports.get(i),questions.get(i));
 					work.sendWork();
 				}
 			
@@ -178,15 +191,16 @@ public class Manager extends Thread{
 	{
 		InetAddress address;
 		int port;
-		Point start;
-		Point end;
+//		Point start;
+//		Point end;
+                CheckinQuestion questionToWork;
 		
-		public SendWorkToWorker(InetAddress address, int port, Point start,Point end)
+		public SendWorkToWorker(InetAddress address, int port, CheckinQuestion questionToWork)
 		{
 			this.address=address;
 			this.port=port;
-			this.start=start;
-			this.end=end;
+			this.questionToWork=questionToWork;
+			//this.end=end;
 		}
 		
 		public void sendWork()
@@ -194,10 +208,10 @@ public class Manager extends Thread{
 			try {
 				Socket socket = new Socket(address, port);
 				ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-				Point[] points= new Point[2];
-				points[0]=start;
-				points[1]=end;
-				out.writeObject(points);
+//				Point[] points= new Point[2];
+//				points[0]=start;
+//				points[1]=end;
+				out.writeObject(new WorkData(questionToWork, reducerAddress));
 				out.flush();
 				
 			} catch (IOException e) {

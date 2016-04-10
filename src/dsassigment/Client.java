@@ -3,6 +3,7 @@ package dsassigment;
 import application.ClientWindow;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -10,36 +11,48 @@ import java.util.Scanner;
 
 public class Client extends Thread {
 	
-	Point[] points;//latitude,longitude;
-	public Client()
-	{
-		points = new Point [2];
-		for (int i = 0; i < points.length; i++) {
-			points[i] = new Point();
-			
-		}
-                
-                new ClientWindow(this);
-	}
+    CheckinQuestion question;
 
-	private void askCoordinates() {
-		Scanner sc = new Scanner(System.in);
-		for (int i = 0; i < 2; i++) {
-			System.out.print("Point("+i+")latitude>");
-			points[i].x = sc.nextDouble();
-			System.out.print("Point("+i+")longitude>");
-			points[i].y = sc.nextDouble();
-			
-		}
-		sc.close();
-		
-		
-	}
-        public void setPoints(Point[] points)
-        {
-            this.points=points;
-        }
-	
+    public Client()
+    {
+         new ClientWindow(this);
+    }
+    
+    
+    
+	//Point[] points;//latitude,longitude;
+//        @Deprecated
+//	public Client()
+//	{
+//		points = new Point [2];
+//		for (int i = 0; i < points.length; i++) {
+//			points[i] = new Point();
+//			
+//		}
+//                
+//                new ClientWindow(this);
+//	}
+//        
+//        @Deprecated
+//	private void askCoordinates() {
+//		Scanner sc = new Scanner(System.in);
+//		for (int i = 0; i < 2; i++) {
+//			System.out.print("Point("+i+")latitude>");
+//			points[i].x = sc.nextDouble();
+//			System.out.print("Point("+i+")longitude>");
+//			points[i].y = sc.nextDouble();
+//			
+//		}
+//		sc.close();
+//		
+//		
+//	}
+//        @Deprecated
+//        public void setPoints(Point[] points)
+//        {
+//            this.points=points;
+//        }
+//	
 	@Override
 	public void run() {
 		//askCoordinates();
@@ -50,7 +63,9 @@ public class Client extends Thread {
 		try {
 			Socket socketToComManager = new Socket("localhost", 4321);
 			ObjectOutputStream out = new ObjectOutputStream (socketToComManager.getOutputStream());
-			out.writeObject(points);
+                        //System.out.println("Client Addr"+);
+                        question.setClientAddress(InetAddress.getLocalHost().getHostAddress());
+			out.writeObject(question);
 			out.flush();
 			//out.close();
 			
@@ -62,5 +77,10 @@ public class Client extends Thread {
 			e.printStackTrace();
 		}
 	}
+
+    public void setQuestion(CheckinQuestion question)
+    {
+        this.question=question;
+    }
 
 }

@@ -47,6 +47,10 @@ public class ManagerWindow extends javax.swing.JFrame
         workerTable = new JTable(2,1);
         ;
         addWorkerjButton = new javax.swing.JButton();
+        reducerAddrTextField = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        changeReducerAddressButton = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -91,14 +95,45 @@ public class ManagerWindow extends javax.swing.JFrame
             }
         });
 
+        reducerAddrTextField.setText("192.168.1.1:80");
+        reducerAddrTextField.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                reducerAddrTextFieldActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Reducer Addr");
+
+        changeReducerAddressButton.setText("Change Address");
+        changeReducerAddressButton.addMouseListener(new java.awt.event.MouseAdapter()
+        {
+            public void mouseClicked(java.awt.event.MouseEvent evt)
+            {
+                changeReducerAddressButtonMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(addWorkerjButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jSeparator1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(reducerAddrTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(addWorkerjButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(changeReducerAddressButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -108,7 +143,18 @@ public class ManagerWindow extends javax.swing.JFrame
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(addWorkerjButton)
-                .addGap(16, 16, 16))
+                .addGap(8, 8, 8)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(reducerAddrTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(changeReducerAddressButton)))
+                .addGap(42, 42, 42))
         );
 
         pack();
@@ -138,11 +184,25 @@ public class ManagerWindow extends javax.swing.JFrame
        ((DefaultTableModel)workerTable.getModel()).addRow(new Object[]{address, portNum, });
     }//GEN-LAST:event_addWorkerjButtonMouseClicked
 
+    private void reducerAddrTextFieldActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_reducerAddrTextFieldActionPerformed
+    {//GEN-HEADEREND:event_reducerAddrTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_reducerAddrTextFieldActionPerformed
+
+    private void changeReducerAddressButtonMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_changeReducerAddressButtonMouseClicked
+    {//GEN-HEADEREND:event_changeReducerAddressButtonMouseClicked
+       manager.setReducerAddress(reducerAddrTextField.getText());
+    }//GEN-LAST:event_changeReducerAddressButtonMouseClicked
+
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addWorkerjButton;
+    private javax.swing.JButton changeReducerAddressButton;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTextField reducerAddrTextField;
     private javax.swing.JTable workerTable;
     // End of variables declaration//GEN-END:variables
 }

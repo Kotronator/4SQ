@@ -5,24 +5,36 @@
  */
 package dsassigment;
 
+import java.io.Serializable;
+
 /**
  *
  * @author tsipiripo
  */
-public class CheckinQuestion
+public class CheckinQuestion implements Serializable
 {
+    private static final long serialVersionUID = 5497841316127816575L;
+    
     Point[] boundPoints;
     TimeBounds tb;
+    String clientAddress;
     
-    CheckinQuestion(Point[] boundPoints, TimeBounds tb)
+    public CheckinQuestion(Point[] boundPoints, TimeBounds tb)
     {
         this.boundPoints=boundPoints;
         this.tb=tb;
     }
     
-    CheckinQuestion(Point[] boundPoints)
+    public CheckinQuestion(Point[] boundPoints)
     {
         this(boundPoints , null);
     }
+
+    void setClientAddress(String hostAddress)
+    {
+        clientAddress=hostAddress;
+    }
+    
+    
             
 }

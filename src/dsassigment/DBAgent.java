@@ -33,13 +33,16 @@ public class DBAgent
         connect();
     }
     
-    public static String formQueryWithPoints(Point[] points)
+    public static String formQueryWithPoints(CheckinQuestion question)
     {
-        if(points.length!=2)
+        if(question.boundPoints.length!=2)
             throw new UnsupportedOperationException("Trying to create a query with bad points");
-        Point UpLeft = points[0];
-        Point BotRight = points[1];
-        return "SELECT * FROM ds_systems_2016.checkins where longitude>"+UpLeft.x+" and longitude<"+BotRight.x+" and latitude<"+UpLeft.y+" and latitude>"+BotRight.y;
+        Point UpLeft = question.boundPoints[0];
+        Point BotRight = question.boundPoints[1];
+        if(question.tb==null)
+            return "SELECT * FROM ds_systems_2016.checkins where longitude>"+UpLeft.x+" and longitude<"+BotRight.x+" and latitude<"+UpLeft.y+" and latitude>"+BotRight.y;
+        else
+            return "SELECT * FROM ds_systems_2016.checkins where longitude>"+UpLeft.x+" and longitude<"+BotRight.x+" and latitude<"+UpLeft.y+" and latitude>"+BotRight.y +" and time>='"+question.tb.d1+"' and time <='"+question.tb.d2+"'";
         
     }
     

@@ -61,27 +61,27 @@ public class Mapper extends Thread implements MapWorker
     @Override
     public void intialize()
     {
-        String input = JOptionPane.showInputDialog("Enter Input:(123.123.123.123:80)");
-
-        String parts[]=input.split(":");
-        String reducerAddressString=parts[0];
-        String reducerPortString=parts[1];
-			
-	//int reducerPortNum=Integer.parseInt(reducerPortString);
-	//InetAddress  address=null;	
-        try {
-                System.out.println(InetAddress.getByName(reducerAddressString));
-                reducerAddress= InetAddress.getByName(reducerAddressString);
-                reducerPortNum=Integer.parseInt(reducerPortString);
-
-
-        } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-        }
-        
-        MyLogger.log("Worker will sent results to"+ reducerAddress.getHostAddress() +":"+reducerPortNum);
-        
+//        String input = JOptionPane.showInputDialog("Enter Input:(123.123.123.123:80)");
+//
+//        String parts[]=input.split(":");
+//        String reducerAddressString=parts[0];
+//        String reducerPortString=parts[1];
+//			
+//	//int reducerPortNum=Integer.parseInt(reducerPortString);
+//	//InetAddress  address=null;	
+//        try {
+//                System.out.println(InetAddress.getByName(reducerAddressString));
+//                reducerAddress= InetAddress.getByName(reducerAddressString);
+//                reducerPortNum=Integer.parseInt(reducerPortString);
+//
+//
+//        } catch (UnknownHostException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//        }
+//        
+//        MyLogger.log("Worker will sent results to"+ reducerAddress.getHostAddress() +":"+reducerPortNum);
+//        
         boolean retry;
         do{
              retry=false;
@@ -176,26 +176,27 @@ public class Mapper extends Thread implements MapWorker
                 //super.run(); //To change body of generated methods, choose Tools | Templates.
                 in = new ObjectInputStream(socket.getInputStream());
                 out = new ObjectOutputStream(socket.getOutputStream());
-                Point[] points= new Point[2];
-                            for (int i = 0; i < points.length; i++) {
-                                    points[i] = new Point();
-
-                            }
+                WorkData workdata=null;
+//                Point[] points= new Point[2];
+//                            for (int i = 0; i < points.length; i++) {
+//                                    points[i] = new Point();
+//
+//                            }
                 MyLogger.log("Start Listening");
-                Object pointstmp = in.readObject();
+                Object workTemp = in.readObject();
 
-                            if(pointstmp instanceof Point[])
+                            if(workTemp instanceof WorkData)
                             {
-                                    points=(Point[])pointstmp;
+                                    workdata=(WorkData)workTemp;
                             }
 
-                            MyLogger.log("P(0)"+points[0].x+","+points[0].y);
-                            MyLogger.log("P(1)"+points[1].x+","+points[1].y);
+                            MyLogger.log("P(0)"+workdata.chq.boundPoints[0].x+","+workdata.chq.boundPoints[0].y);
+                            MyLogger.log("P(1)"+workdata.chq.boundPoints[1].x+","+workdata.chq.boundPoints[1].y);
                             
                             long start, end; 
                             start = System.currentTimeMillis();
                             
-                            ArrayList<CheckIn> list = askDataBase(points);
+                            ArrayList<CheckIn> list = askDataBase(workdata.chq);
                             System.out.println("Worker is processing:"+list.size()+" checkins");
                             List<Map<CheckinKey, List<CheckinValue>>> intermediate = mapData(list);
                             
@@ -203,7 +204,7 @@ public class Mapper extends Thread implements MapWorker
                             
                             System.out.println("Processing Time:"+(end-start)/1000.0);
                             
-                            sendToReducer(intermediate);
+                            sendToReducer(intermediate, workdata.reducerAddr);
 //                            Set set = intermediate.entrySet();
 //                            Iterator it = set.iterator();
 //
@@ -222,10 +223,10 @@ public class Mapper extends Thread implements MapWorker
             }
         }
 
-        private ArrayList<CheckIn> askDataBase(Point[] points) {
+        private ArrayList<CheckIn> askDataBase(CheckinQuestion question) {
             
             DBAgent dba = new DBAgent();
-            ArrayList<CheckIn> results= dba.createQuery(DBAgent.formQueryWithPoints(points));
+            ArrayList<CheckIn> results= dba.createQuery(DBAgent.formQueryWithPoints(question));
 
             return results;
 //            Map<CheckinKey, List<CheckinValue>> data = mapList(results);
@@ -290,11 +291,11 @@ public class Mapper extends Thread implements MapWorker
             return areas;
         }
 
-        private void sendToReducer(List<Map<CheckinKey, List<CheckinValue>>> intermediate)
+        private void sendToReducer(List<Map<CheckinKey, List<CheckinValue>>> intermediate, String address)
         {
             try
             {
-                Socket reducerSocket = new Socket(reducerAddress, reducerPortNum);
+                Socket reducerSocket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]));
                 ObjectOutputStream out = new ObjectOutputStream(reducerSocket.getOutputStream());
 		out.writeObject(intermediate);
                 MyLogger.log("Mapper wrotre:"+intermediate.size());

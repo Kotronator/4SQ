@@ -5,13 +5,15 @@
  */
 package dsassigment;
 
+import java.io.Serializable;
 import java.sql.Date;
 /**
  *
  * @author tsipiripo
  */
-class TimeBounds
+public class TimeBounds implements Serializable
 {
+     private static final long serialVersionUID = 5497841116127816575L;
     
     Date d1,d2;
     

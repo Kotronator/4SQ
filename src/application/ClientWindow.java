@@ -5,8 +5,16 @@
  */
 package application;
 
+import dsassigment.CheckinQuestion;
 import dsassigment.Client;
 import dsassigment.Point;
+import dsassigment.TimeBounds;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.swing.JFrame;
 
 /**
@@ -53,6 +61,12 @@ public class ClientWindow extends javax.swing.JFrame
         jLabel6 = new javax.swing.JLabel();
         BotRLati = new javax.swing.JSpinner();
         jButton1 = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        dateUseCheckBox = new javax.swing.JCheckBox();
+        startDaySpinner = new javax.swing.JSpinner();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        endDaySpinner = new javax.swing.JSpinner();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -89,6 +103,61 @@ public class ClientWindow extends javax.swing.JFrame
             }
         });
 
+        dateUseCheckBox.setText("UseDateBounds(m/d/y)");
+        dateUseCheckBox.addMouseListener(new java.awt.event.MouseAdapter()
+        {
+            public void mouseClicked(java.awt.event.MouseEvent evt)
+            {
+                dateUseCheckBoxMouseClicked(evt);
+            }
+        });
+
+        startDaySpinner.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(1338541200000L), null, null, java.util.Calendar.MONTH));
+        startDaySpinner.setEnabled(false);
+
+        jLabel7.setText("StartDate:");
+
+        jLabel8.setText("EndDate:");
+
+        endDaySpinner.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(1359981300000L), null, null, java.util.Calendar.DAY_OF_MONTH));
+        endDaySpinner.setEnabled(false);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(dateUseCheckBox)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(17, 17, 17)
+                        .addComponent(jLabel7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(startDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(endDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(dateUseCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(startDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(endDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel8)))
+                .addContainerGap(79, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -120,6 +189,7 @@ public class ClientWindow extends javax.swing.JFrame
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jButton1)))
                 .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -140,7 +210,8 @@ public class ClientWindow extends javax.swing.JFrame
                     .addComponent(BotRLati, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(33, 33, 33)
                 .addComponent(jButton1)
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -153,9 +224,41 @@ public class ClientWindow extends javax.swing.JFrame
         Point Upleft = new Point((Double)UpLLong.getValue(), (Double)UpLLati.getValue());
         Point Botright = new Point((Double) BotRLong.getValue(), (Double)BotRLati.getValue());
         
-        client.setPoints(new Point[]{Upleft,Botright});
+        java.util.Date startDate,endDate;
+        startDate=(java.util.Date)startDaySpinner.getValue();
+        endDate=(java.util.Date)endDaySpinner.getValue();
+        
+        //System.out.println("date:"+startDate);  
+        //System.out.println("time:"+startDate.getTime());
+        
+                
+        java.sql.Date startsqlDate = new java.sql.Date(startDate.getTime());
+        java.sql.Date endsqlDate = new java.sql.Date(endDate.getTime());
+        
+        CheckinQuestion question;
+        
+        if(dateUseCheckBox.isSelected())
+        {
+            question = new CheckinQuestion(new Point[]{Upleft,Botright}, new TimeBounds(startsqlDate,endsqlDate));
+        }else
+        {
+           question = new CheckinQuestion(new Point[]{Upleft,Botright});
+        }
+        
+        client.setQuestion(question);
+        //client.setPoints(new Point[]{Upleft,Botright});
         client.sendPointsToManager();
     }//GEN-LAST:event_jButton1MouseClicked
+
+    private void dateUseCheckBoxMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_dateUseCheckBoxMouseClicked
+    {//GEN-HEADEREND:event_dateUseCheckBoxMouseClicked
+        // TODO add your handling code here:
+       
+            
+            startDaySpinner.setEnabled(dateUseCheckBox.isSelected());
+            endDaySpinner.setEnabled(dateUseCheckBox.isSelected());
+        
+    }//GEN-LAST:event_dateUseCheckBoxMouseClicked
 
     /**
      * @param args the command line arguments
@@ -167,6 +270,8 @@ public class ClientWindow extends javax.swing.JFrame
     private javax.swing.JSpinner BotRLong;
     private javax.swing.JSpinner UpLLati;
     private javax.swing.JSpinner UpLLong;
+    private javax.swing.JCheckBox dateUseCheckBox;
+    private javax.swing.JSpinner endDaySpinner;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -174,5 +279,9 @@ public class ClientWindow extends javax.swing.JFrame
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JSpinner startDaySpinner;
     // End of variables declaration//GEN-END:variables
 }

@@ -37,7 +37,7 @@ public class Reducer extends Thread implements ReduceWorker
     List<Map<CheckinKey, List<CheckinValue>>> collectedData = new ArrayList<Map<CheckinKey, List<CheckinValue>>>();
     
     int countMapperReaded =0;
-    int totalMappers =3;
+    int totalMappers =1;
 
     public Reducer()
     {
