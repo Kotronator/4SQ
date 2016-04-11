@@ -47,8 +47,7 @@ public class ClientWindow extends javax.swing.JFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents()
-    {
+    private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -67,6 +66,10 @@ public class ClientWindow extends javax.swing.JFrame
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         endDaySpinner = new javax.swing.JSpinner();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        resultTextArea = new javax.swing.JTextArea();
+        forwardTopKCheckBox1 = new javax.swing.JCheckBox();
+        topKjSpinner = new javax.swing.JSpinner();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -95,19 +98,15 @@ public class ClientWindow extends javax.swing.JFrame
         BotRLati.setName(""); // NOI18N
 
         jButton1.setText("Ask");
-        jButton1.addMouseListener(new java.awt.event.MouseAdapter()
-        {
-            public void mouseClicked(java.awt.event.MouseEvent evt)
-            {
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jButton1MouseClicked(evt);
             }
         });
 
         dateUseCheckBox.setText("UseDateBounds(m/d/y)");
-        dateUseCheckBox.addMouseListener(new java.awt.event.MouseAdapter()
-        {
-            public void mouseClicked(java.awt.event.MouseEvent evt)
-            {
+        dateUseCheckBox.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
                 dateUseCheckBoxMouseClicked(evt);
             }
         });
@@ -122,6 +121,11 @@ public class ClientWindow extends javax.swing.JFrame
         endDaySpinner.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(1359981300000L), null, null, java.util.Calendar.DAY_OF_MONTH));
         endDaySpinner.setEnabled(false);
 
+        resultTextArea.setColumns(20);
+        resultTextArea.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
+        resultTextArea.setRows(5);
+        jScrollPane1.setViewportView(resultTextArea);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -129,19 +133,20 @@ public class ClientWindow extends javax.swing.JFrame
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(dateUseCheckBox)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(17, 17, 17)
                         .addComponent(jLabel7)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(startDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 166, Short.MAX_VALUE)
                         .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(endDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(endDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(dateUseCheckBox)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addComponent(jScrollPane1)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -149,19 +154,31 @@ public class ClientWindow extends javax.swing.JFrame
                 .addContainerGap()
                 .addComponent(dateUseCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(startDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(endDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel8)))
-                .addContainerGap(79, Short.MAX_VALUE))
+                        .addComponent(jLabel8))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(startDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel7)))
+                .addGap(39, 39, 39)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE))
         );
+
+        forwardTopKCheckBox1.setText("forward Top K");
+        forwardTopKCheckBox1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                forwardTopKCheckBox1MouseClicked(evt);
+            }
+        });
+
+        topKjSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(10), Integer.valueOf(1), null, Integer.valueOf(1)));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -187,9 +204,13 @@ public class ClientWindow extends javax.swing.JFrame
                         .addComponent(UpLLati, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(topKjSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(forwardTopKCheckBox1)))))
                 .addContainerGap())
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -210,6 +231,10 @@ public class ClientWindow extends javax.swing.JFrame
                     .addComponent(BotRLati, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(33, 33, 33)
                 .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(forwardTopKCheckBox1)
+                    .addComponent(topKjSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -244,7 +269,9 @@ public class ClientWindow extends javax.swing.JFrame
         {
            question = new CheckinQuestion(new Point[]{Upleft,Botright});
         }
-        
+        question.setForwardTopK(forwardTopKCheckBox1.isEnabled());
+        question.setTopK(((Integer)topKjSpinner.getValue()).intValue());
+        System.out.println(question.getTopK());
         client.setQuestion(question);
         //client.setPoints(new Point[]{Upleft,Botright});
         client.sendPointsToManager();
@@ -260,10 +287,18 @@ public class ClientWindow extends javax.swing.JFrame
         
     }//GEN-LAST:event_dateUseCheckBoxMouseClicked
 
+    private void forwardTopKCheckBox1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_forwardTopKCheckBox1MouseClicked
+        // TODO add your handling code here:
+        //client.setForwardTopK(forwardTopKCheckBox1.isEnabled());
+    }//GEN-LAST:event_forwardTopKCheckBox1MouseClicked
+
     /**
      * @param args the command line arguments
      */
-    
+    public void appendResultNL(String result)
+    {
+        resultTextArea.append(result+"\n");
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSpinner BotRLati;
@@ -272,6 +307,7 @@ public class ClientWindow extends javax.swing.JFrame
     private javax.swing.JSpinner UpLLong;
     private javax.swing.JCheckBox dateUseCheckBox;
     private javax.swing.JSpinner endDaySpinner;
+    private javax.swing.JCheckBox forwardTopKCheckBox1;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -282,6 +318,9 @@ public class ClientWindow extends javax.swing.JFrame
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea resultTextArea;
     private javax.swing.JSpinner startDaySpinner;
+    private javax.swing.JSpinner topKjSpinner;
     // End of variables declaration//GEN-END:variables
 }

@@ -18,6 +18,8 @@ public class CheckinQuestion implements Serializable
     Point[] boundPoints;
     TimeBounds tb;
     String clientAddress;
+    boolean forwardTopK;
+    int limit=10;
     
     public CheckinQuestion(Point[] boundPoints, TimeBounds tb)
     {
@@ -35,6 +37,19 @@ public class CheckinQuestion implements Serializable
         clientAddress=hostAddress;
     }
     
+    public void setForwardTopK(boolean forwardTopK)
+    {
+        this.forwardTopK=forwardTopK;
+    }
     
+     public void setTopK(int i) {
+        this.limit=i;
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+     
+     public int getTopK() {
+        return limit;
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
             
 }

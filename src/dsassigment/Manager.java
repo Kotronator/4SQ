@@ -167,6 +167,7 @@ public class Manager extends Thread{
 					Point tmpPoint2 = new Point(tmpPoint1.x+xbound, tmpPoint1.y+dy);
                                         CheckinQuestion q =new CheckinQuestion(new Point[]{tmpPoint1,tmpPoint2},question.tb);
                                         q.setClientAddress(question.clientAddress);
+                                        q.setTopK(question.getTopK());
                                         questions.add(q);
 					//endPoints.add(tmpPoint2);
 				}
@@ -211,7 +212,7 @@ public class Manager extends Thread{
 //				Point[] points= new Point[2];
 //				points[0]=start;
 //				points[1]=end;
-				out.writeObject(new WorkData(questionToWork, reducerAddress));
+				out.writeObject(new WorkData(questionToWork, reducerAddress, workersAddreses.size()));
 				out.flush();
 				
 			} catch (IOException e) {

@@ -198,13 +198,13 @@ public class Mapper extends Thread implements MapWorker
                             
                             ArrayList<CheckIn> list = askDataBase(workdata.chq);
                             System.out.println("Worker is processing:"+list.size()+" checkins");
-                            List<Map<CheckinKey, List<CheckinValue>>> intermediate = mapData(list);
+                            List<Map<CheckinKey, List<CheckinValue>>> intermediate = mapData(list,workdata.chq);
                             
                             end = System.currentTimeMillis();
                             
                             System.out.println("Processing Time:"+(end-start)/1000.0);
                             
-                            sendToReducer(intermediate, workdata.reducerAddr);
+                            sendToReducer(intermediate, workdata);
 //                            Set set = intermediate.entrySet();
 //                            Iterator it = set.iterator();
 //
@@ -245,15 +245,16 @@ public class Mapper extends Thread implements MapWorker
             
         }
 
-        public List<Map<CheckinKey, List<CheckinValue>>> mapData(ArrayList<CheckIn> list) 
+        public List<Map<CheckinKey, List<CheckinValue>>> mapData(ArrayList<CheckIn> list,CheckinQuestion chq) 
         {
 
 //           Comparator<Map.Entry<String,Integer>> comp =Map.Entry.<String,Integer>comparingByValue(Comparator.reverseOrder())
 //                   .thenComparing(Map.Entry.comparingByKey());
 //            return  input.parallelStream().collect(  Collectors.groupingBy(CheckIn::getCheckinKey,Collectors.mapping(CheckIn::getCheckinValue, Collectors.toList())));
-            
-            return  splitData(list).parallelStream().map(Area::collectCheckins).collect(Collectors.toList());
-            
+            if(!chq.forwardTopK)
+                return  splitData(list).parallelStream().map(p->p.collectCheckins(0)).collect(Collectors.toList());
+            else
+                return  splitData(list).parallelStream().map(p->p.collectCheckins(chq.getTopK())).collect(Collectors.toList());
      
         }
 
@@ -291,13 +292,14 @@ public class Mapper extends Thread implements MapWorker
             return areas;
         }
 
-        private void sendToReducer(List<Map<CheckinKey, List<CheckinValue>>> intermediate, String address)
+        private void sendToReducer(List<Map<CheckinKey, List<CheckinValue>>> intermediate, WorkData work)
         {
             try
             {
-                Socket reducerSocket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]));
+                
+                Socket reducerSocket = new Socket(work.reducerAddr.split(":")[0], Integer.parseInt(work.reducerAddr.split(":")[1]));
                 ObjectOutputStream out = new ObjectOutputStream(reducerSocket.getOutputStream());
-		out.writeObject(intermediate);
+		out.writeObject(new ReduceData(intermediate, work.chq.clientAddress,work.numOfWorkers,work.chq.getTopK()));
                 MyLogger.log("Mapper wrotre:"+intermediate.size());
                 MyLogger.log("A0:"+intermediate.get(0).size());
 		out.flush();

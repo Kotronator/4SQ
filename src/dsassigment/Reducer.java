@@ -5,6 +5,8 @@
  */
 package dsassigment;
 
+
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -15,11 +17,15 @@ import java.net.Socket;
 import java.net.SocketImpl;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 import logger.MyLogger;
 
@@ -41,7 +47,7 @@ public class Reducer extends Thread implements ReduceWorker
 
     public Reducer()
     {
-        MyLogger.log("Create Mapper");
+        MyLogger.log("Create Reducer");
     }
 
      public void run()
@@ -79,6 +85,20 @@ public class Reducer extends Thread implements ReduceWorker
     public Map<Integer, Object> reduce(int key, Object val)
     {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public static void sendResultsToClient(HashMap<CheckinKey, List<CheckinValue>> finalData , String clientAddress)
+    {
+        try {
+            Socket socket = new Socket(clientAddress.split(":")[0], Integer.parseInt(clientAddress.split(":")[1]));
+             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+		out.writeObject(finalData);
+                MyLogger.log("Sending Results to Client");
+
+		out.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(Reducer.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -141,7 +161,7 @@ public class Reducer extends Thread implements ReduceWorker
         }
     }
 
-    public void reduceData()
+    public static HashMap<CheckinKey, List<CheckinValue>> reduceData(List<Map<CheckinKey, List<CheckinValue>>> collectedData,int limit)
     {   
         MyLogger.log("Reducing "+ collectedData.size() );
         if(collectedData.size()>0)
@@ -149,8 +169,19 @@ public class Reducer extends Thread implements ReduceWorker
         
         HashMap<CheckinKey, List<CheckinValue>> finalValue = collectedData.stream().reduce(new MyMap(),(finalMap,partialMap)-> finalMap.addMap(partialMap),(finalMap1, finalMap2) -> finalMap1.addMap(finalMap2));
         
+        Comparator<List<CheckinValue>> listcmp = (List<CheckinValue> o1, List<CheckinValue> o2)->  o2.size()-o1.size();
+        
+        Comparator<Map.Entry<CheckinKey, List<CheckinValue>>> cmp = Map.Entry.<CheckinKey, List<CheckinValue>>comparingByValue(listcmp);
+        //Map.Entry.<CheckinKey, List<CheckinValue>>comparingByValue(Comparator.reverseOrder()).thenComparing(Map.Entry.comparingByKey());
+        LinkedHashMap<CheckinKey, List<CheckinValue>> linkedresult =finalValue.entrySet().stream().sorted(cmp).limit(limit).collect(
+                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> {throw new IllegalStateException();}, LinkedHashMap::new)
+        );
+        
+        
+        
+        
         int i=0;
-        for (Map.Entry<CheckinKey, List<CheckinValue>> entrySet : finalValue.entrySet())
+        for (Map.Entry<CheckinKey, List<CheckinValue>> entrySet : linkedresult.entrySet())
         {
             if(i>10)
                 break;
@@ -160,12 +191,13 @@ public class Reducer extends Thread implements ReduceWorker
             MyLogger.log("CheckIn K:" + key+ "V size:"+ value.size()+ " | "+value);
             i++;
         }
+        return linkedresult;
     }
     
     @Override
     public void waitForTasksThread()
     {
-        MyLogger.log("Mapper starts waiting for tasks");
+        MyLogger.log("Reducer starts waiting for tasks");
         
         try
         {
@@ -205,16 +237,19 @@ public class Reducer extends Thread implements ReduceWorker
                 in = new ObjectInputStream(socket.getInputStream());
                 out = new ObjectOutputStream(socket.getOutputStream());
                 List<Map<CheckinKey, List<CheckinValue>>> intermediate = null;
+                ReduceData reduceData=null;
 
                 MyLogger.log("Start Listening");
                 while(countMapperReaded<totalMappers)
                 {
-                    Object pointstmp = in.readObject();
+                    Object reduceDatatmp = in.readObject();
                     //ArrayList<HashMap<CheckinKey, ArrayList<CheckinValue>>> points
                     MyLogger.log("got object");
-                    if(pointstmp instanceof ArrayList)
+                    if(reduceDatatmp instanceof ReduceData)
                     {
-                        intermediate = (ArrayList<Map<CheckinKey, List<CheckinValue>>>) pointstmp;
+                        reduceData = (ReduceData) reduceDatatmp;
+                        totalMappers=reduceData.expectedNumOfWorkers;
+                        intermediate=reduceData.intermediate;
                     }
 
                     if(intermediate!=null){
@@ -231,7 +266,9 @@ public class Reducer extends Thread implements ReduceWorker
                     MyLogger.log("Readed from "+countMapperReaded+" Mappers");
                 }
                 MyLogger.log("Reducing Data");
-                reduceData();
+                HashMap<CheckinKey, List<CheckinValue>> reducedData = reduceData(intermediate, reduceData.limiResults);
+                
+                sendResultsToClient(reducedData, reduceData.clientAddress);
                 MyLogger.log("Data Reduced");
                     
                 

@@ -17,12 +17,14 @@ public class WorkData implements Serializable
     
     CheckinQuestion chq;
     String reducerAddr;
+    int numOfWorkers;
 
 
-    public WorkData(CheckinQuestion chq, String reducerAddr)
+    public WorkData(CheckinQuestion chq, String reducerAddr, int numOfWorkers)
     {
         this.chq = chq;
         this.reducerAddr = reducerAddr;
+        this.numOfWorkers=numOfWorkers;
     }
     
     
