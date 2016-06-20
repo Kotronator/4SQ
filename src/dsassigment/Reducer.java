@@ -87,8 +87,10 @@ public class Reducer extends Thread implements ReduceWorker
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    public static void sendResultsToClient(HashMap<CheckinKey, List<CheckinValue>> finalData , String clientAddress)
+    public void sendResultsToClient(HashMap<CheckinKey, List<CheckinValue>> finalData , String clientAddress)
     {
+        countMapperReaded=0;
+        MyLogger.log("Reducer -> Client ip"+clientAddress);
         try {
             Socket socket = new Socket(clientAddress.split(":")[0], Integer.parseInt(clientAddress.split(":")[1]));
              ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
@@ -164,9 +166,14 @@ public class Reducer extends Thread implements ReduceWorker
     public static HashMap<CheckinKey, List<CheckinValue>> reduceData(List<Map<CheckinKey, List<CheckinValue>>> collectedData,int limit)
     {   
         MyLogger.log("Reducing "+ collectedData.size() );
-        if(collectedData.size()>0)
-            MyLogger.log("Reducing A0"+ collectedData.get(0).size() );
-        
+        if(collectedData.size()>0){
+            int sum=0;
+            for (int i = 0; i < collectedData.size(); i++)
+            {
+                sum+=collectedData.get(0).size();
+            }
+            MyLogger.log("Reducing total:"+ sum );
+        }
         HashMap<CheckinKey, List<CheckinValue>> finalValue = collectedData.stream().reduce(new MyMap(),(finalMap,partialMap)-> finalMap.addMap(partialMap),(finalMap1, finalMap2) -> finalMap1.addMap(finalMap2));
         
         Comparator<List<CheckinValue>> listcmp = (List<CheckinValue> o1, List<CheckinValue> o2)->  o2.size()-o1.size();
@@ -265,6 +272,7 @@ public class Reducer extends Thread implements ReduceWorker
                     countMapperReaded++;
                     MyLogger.log("Readed from "+countMapperReaded+" Mappers");
                 }
+                
                 MyLogger.log("Reducing Data");
                 HashMap<CheckinKey, List<CheckinValue>> reducedData = reduceData(intermediate, reduceData.limiResults);
                 

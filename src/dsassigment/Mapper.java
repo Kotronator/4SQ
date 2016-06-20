@@ -303,6 +303,7 @@ public class Mapper extends Thread implements MapWorker
                 MyLogger.log("Mapper wrotre:"+intermediate.size());
                 MyLogger.log("A0:"+intermediate.get(0).size());
 		out.flush();
+                //reducerSocket.close();
                 
                 //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             } catch (IOException ex)

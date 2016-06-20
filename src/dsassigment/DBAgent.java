@@ -39,11 +39,18 @@ public class DBAgent
             throw new UnsupportedOperationException("Trying to create a query with bad points");
         Point UpLeft = question.boundPoints[0];
         Point BotRight = question.boundPoints[1];
-        if(question.tb==null)
-            return "SELECT * FROM ds_systems_2016.checkins where longitude>"+UpLeft.x+" and longitude<"+BotRight.x+" and latitude<"+UpLeft.y+" and latitude>"+BotRight.y;
-        else
-            return "SELECT * FROM ds_systems_2016.checkins where longitude>"+UpLeft.x+" and longitude<"+BotRight.x+" and latitude<"+UpLeft.y+" and latitude>"+BotRight.y +" and time>='"+question.tb.d1+"' and time <='"+question.tb.d2+"'";
         
+        
+        if(question.tb==null||(question.tb.d1==null&&question.tb.d2==null))
+            return "SELECT * FROM ds_systems_2016.checkins where longitude>"+UpLeft.x+" and longitude<"+BotRight.x+" and latitude<"+UpLeft.y+" and latitude>"+BotRight.y;
+        else{
+            if(question.tb.d1!=null&&question.tb.d2==null)
+                return "SELECT * FROM ds_systems_2016.checkins where longitude>"+UpLeft.x+" and longitude<"+BotRight.x+" and latitude<"+UpLeft.y+" and latitude>"+BotRight.y +" and time>='"+question.tb.d1+"'";
+            else if(question.tb.d1==null&&question.tb.d2!=null)
+                return "SELECT * FROM ds_systems_2016.checkins where longitude>"+UpLeft.x+" and longitude<"+BotRight.x+" and latitude<"+UpLeft.y+" and latitude>"+BotRight.y +" and time <='"+question.tb.d2+"'";
+            else
+                return "SELECT * FROM ds_systems_2016.checkins where longitude>"+UpLeft.x+" and longitude<"+BotRight.x+" and latitude<"+UpLeft.y+" and latitude>"+BotRight.y +" and time>='"+question.tb.d1+"' and time <='"+question.tb.d2+"'";
+        }
     }
     
     public ArrayList<CheckIn> createQuery(String query)
@@ -66,7 +73,7 @@ public class DBAgent
                 //int id  = rs.getInt("id");
                 //int age = rs.getInt("POI_category_id");
                 
-                results.add(new CheckIn(rs.getInt("id"), rs.getInt("user"), rs.getString("POI"), rs.getString("POI_name"), rs.getString("POI_category"), rs.getInt("POI_category_id"), rs.getDouble("latitude"), rs.getInt("longitude"), rs.getDate("time"), rs.getString("photos")) );
+                results.add(new CheckIn(rs.getInt("id"), rs.getInt("user"), rs.getString("POI"), rs.getString("POI_name"), rs.getString("POI_category"), rs.getInt("POI_category_id"), rs.getDouble("latitude"), rs.getDouble("longitude"), rs.getDate("time"), rs.getString("photos")) );
                         //CheckIn(int id, int user, String POI, String POI_name, String POI_category, int POI_category_id, double latitude, double longitude, Date time, String photos)
                 //Display values
                 //System.out.print("ID: " + id);
